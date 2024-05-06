@@ -34,8 +34,20 @@ func main() {
 	app.Post("/books", createBook)
 	app.Put("/books/:id", updateBook)
 	app.Delete("/books/:id", deleteBook)
+	app.Post("/upload", uploadfile)
 
 	app.Listen(":8080")
+}
+func uploadfile(c *fiber.Ctx) error {
+	file, err := c.FormFile("image")
+	if err != nil {
+		return c.Status(fiber.ErrBadRequest.Code).SendString(err.Error())
+	}
+	err = c.SaveFile(file, "./assets/"+file.Filename)
+	if err != nil {
+		c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	return c.SendString("File uploaded successfully")
 }
 
 // todo : Controller
